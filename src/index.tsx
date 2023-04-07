@@ -1,14 +1,12 @@
 import {render} from 'solid-js/web'
-import {FirebaseProvider} from 'solid-firebase'
-import App from './App'
-
-const firebaseConfig = {}
+import {Router} from "@solidjs/router";
+import App from "./App";
 
 render(
     () => (
-        <FirebaseProvider config={firebaseConfig}>
+        <Router>
             <App/>
-        </FirebaseProvider>
+        </Router>
     ),
-    document.getElementById('root')!!,
+    document.getElementById('root') as HTMLElement,
 )

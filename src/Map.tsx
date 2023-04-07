@@ -1,14 +1,22 @@
-import {createEffect, createSignal, For, onCleanup} from "solid-js";
+import {Component, createEffect, createSignal, For, onCleanup, onMount} from "solid-js";
+import {auth} from "./firebase";
+import {useNavigate} from "@solidjs/router";
 
-interface MapProps {
-}
-
-const Map = (props: MapProps) => {
+const Map: Component = () => {
     const [scale, setScale] = createSignal(1);
     const [position, setPosition] = createSignal({x: 0, y: 0});
     const [pins, setPins] = createSignal<Array<{ x: number; y: number }>>([]);
     let container!: HTMLDivElement;
     let isDragging = false;
+
+    onMount(() => {
+        if (!auth.currentUser) {
+            console.log("User is not logged in:", auth.currentUser);
+            //redirect to map
+            const navigate = useNavigate();
+            navigate("/");
+        }
+    });
 
     const handleClick = (e: MouseEvent) => {
         if (isDragging) return;

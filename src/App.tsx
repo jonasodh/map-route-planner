@@ -1,11 +1,15 @@
-import type {Component} from 'solid-js';
+import {Component} from "solid-js";
+import {Route, Routes} from "@solidjs/router";
 import Map from "./Map";
+import Login from "./routes/Login";
 
 const App: Component = () => {
-
     return (
         <div>
-            <Map/>
+            <Routes>
+                <Route path={"/"} component={Login}/>
+                <Route path={"/map"} component={Map}/>
+            </Routes>
         </div>
     );
 };
