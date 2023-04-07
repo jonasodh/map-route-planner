@@ -6,7 +6,7 @@ interface MapProps {
 const Map = (props: MapProps) => {
     const [scale, setScale] = createSignal(1);
     const [position, setPosition] = createSignal({x: 0, y: 0});
-    let container: HTMLDivElement;
+    let container!: HTMLDivElement;
 
     createEffect(() => {
         if (!container) return;
@@ -41,8 +41,9 @@ const Map = (props: MapProps) => {
             const delta = e.deltaY < 0 ? 1.1 : 0.9;
             const newScale = scale() * delta;
 
-            const x = e.clientX;
-            const y = e.clientY;
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
             const newPosition = {
                 x: (position().x - x) * delta + x,
@@ -82,15 +83,14 @@ const Map = (props: MapProps) => {
             <div
                 ref={container}
                 style={{
-                    position: "relative",
-                    overflow: "hidden",
-                    width: "100vw",
-                    height: "100vh",
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                    transform: `translate(${position().x}px, ${position().y}px) scale(${scale()})`,
-                    cursor: "move",
+                    "position": "relative",
+                    "overflow": "hidden",
+                    "width": "100vw",
+                    "height": "100vh",
+                    "background-size": `${scale() * 100}%`,
+                    "background-repeat": "no-repeat",
+                    "background-position": `${position().x}px ${position().y}px`,
+                    "cursor": "move",
                 }}
             ></div>
         </>
