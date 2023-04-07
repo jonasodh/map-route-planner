@@ -1,5 +1,5 @@
-import { render } from 'solid-js/web'
-import { FirebaseProvider } from 'solid-firebase'
+import {render} from 'solid-js/web'
+import {FirebaseProvider} from 'solid-firebase'
 import App from './App'
 
 const firebaseConfig = {}
@@ -7,7 +7,7 @@ const firebaseConfig = {}
 render(
     () => (
         <FirebaseProvider config={firebaseConfig}>
-          <App />
+            <App/>
         </FirebaseProvider>
     ),
     document.getElementById('root')!!,

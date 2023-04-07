@@ -1,4 +1,4 @@
-import {createEffect, createSignal, onCleanup} from "solid-js";
+import {createEffect, createSignal, For, onCleanup} from "solid-js";
 
 interface MapProps {
 }
@@ -6,18 +6,35 @@ interface MapProps {
 const Map = (props: MapProps) => {
     const [scale, setScale] = createSignal(1);
     const [position, setPosition] = createSignal({x: 0, y: 0});
+    const [pins, setPins] = createSignal<Array<{ x: number; y: number }>>([]);
     let container!: HTMLDivElement;
+    let isDragging = false;
 
+    const handleClick = (e: MouseEvent) => {
+        if (isDragging) return;
+
+        e.preventDefault();
+        const rect = container.getBoundingClientRect();
+        const pinWidth = 25;
+        const pinHeight = 25;
+        const offsetX = pinWidth / 2;
+        const offsetY = pinHeight / 2;
+        const x = (e.clientX - rect.left - position().x - offsetX) / scale();
+        const y = (e.clientY - rect.top - position().y - offsetY) / scale();
+        setPins([...pins(), {x, y}]);
+    };
     createEffect(() => {
         if (!container) return;
 
         const handleMouseDown = (e: MouseEvent) => {
             e.preventDefault();
 
+            isDragging = false;
             const startX = e.clientX - position().x;
             const startY = e.clientY - position().y;
 
             const onMouseMove = (e: MouseEvent) => {
+                isDragging = true;
                 setPosition({x: e.clientX - startX, y: e.clientY - startY});
             };
 
@@ -28,11 +45,6 @@ const Map = (props: MapProps) => {
 
             window.addEventListener("mousemove", onMouseMove);
             window.addEventListener("mouseup", onMouseUp);
-
-            onCleanup(() => {
-                window.removeEventListener("mousemove", onMouseMove);
-                window.removeEventListener("mouseup", onMouseUp);
-            });
         };
 
         const handleWheel = (e: WheelEvent) => {
@@ -56,10 +68,12 @@ const Map = (props: MapProps) => {
 
         container.addEventListener("mousedown", handleMouseDown);
         container.addEventListener("wheel", handleWheel);
+        container.addEventListener("click", handleClick);
 
         onCleanup(() => {
             container.removeEventListener("mousedown", handleMouseDown);
             container.removeEventListener("wheel", handleWheel);
+            container.removeEventListener("click", handleClick);
         });
     });
 
@@ -76,7 +90,6 @@ const Map = (props: MapProps) => {
             reader.readAsDataURL(target.files[0]);
         }
     };
-
     return (
         <>
             <input type="file" accept="image/*" onChange={handleFileChange}/>
@@ -90,9 +103,25 @@ const Map = (props: MapProps) => {
                     "background-size": `${scale() * 100}%`,
                     "background-repeat": "no-repeat",
                     "background-position": `${position().x}px ${position().y}px`,
-                    "cursor": "move",
                 }}
-            ></div>
+            >
+                <For each={pins()}>{(pin) => (
+                    <div
+                        style={{
+                            "position": "absolute",
+                            "left": `${(pin.x * scale() + position().x)}px`,
+                            "top": `${(pin.y * scale() + position().y)}px`,
+                            "width": "25px",
+                            "height": "25px",
+                            "background-color": "red",
+                            "border-radius": "50%",
+                            "background-size": `${scale() * 100}%`,
+                            "background-repeat": "no-repeat",
+                            "background-position": `${position().x}px ${position().y}px`,
+                        }}
+                    ></div>
+                )}</For>
+            </div>
         </>
     );
 };
