@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2018",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "jsxFactory": "Solid.createElement",
+    "jsxFragment": "Solid.Fragment",
+    "jsxFragmentFactory": "Solid.Fragment",
+    "jsxImportSource": "solid-js",
+    "types": [
+      "vite/client"
+    ],
+    "noEmit": true,
+    "isolatedModules": true
+  }
+}
