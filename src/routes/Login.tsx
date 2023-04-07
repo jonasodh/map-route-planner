@@ -4,12 +4,13 @@ import {onAuthStateChanged, signInWithPopup} from "firebase/auth";
 import {useNavigate} from "@solidjs/router";
 
 const LoginComponent = () => {
+    const navigate = useNavigate();
+
     async function signInWithGoogle() {
 
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
-            const navigate = useNavigate();
             console.log("User successfully logged in:", user);
             navigate("/map");
         } catch (error) {
@@ -20,16 +21,13 @@ const LoginComponent = () => {
     onMount(() => {
         if (auth.currentUser) {
             console.log("User is logged in:", auth.currentUser);
-            //redirect to map
-            const navigate = useNavigate();
-            navigate("/map");
         }
 
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log("User is logged in:", user);
                 //redirect to map
-
+                navigate("/map");
             } else {
                 console.log("User is logged out");
             }

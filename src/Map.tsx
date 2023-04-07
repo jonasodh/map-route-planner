@@ -1,6 +1,7 @@
 import {Component, createEffect, createSignal, For, onCleanup, onMount} from "solid-js";
 import {auth} from "./firebase";
 import {useNavigate} from "@solidjs/router";
+import createMap from "./core/components/createMap";
 
 const Map: Component = () => {
     const [scale, setScale] = createSignal(1);
@@ -8,12 +9,11 @@ const Map: Component = () => {
     const [pins, setPins] = createSignal<Array<{ x: number; y: number }>>([]);
     let container!: HTMLDivElement;
     let isDragging = false;
-
+    const navigate = useNavigate();
     onMount(() => {
         if (!auth.currentUser) {
             console.log("User is not logged in:", auth.currentUser);
             //redirect to map
-            const navigate = useNavigate();
             navigate("/");
         }
     });
@@ -98,9 +98,15 @@ const Map: Component = () => {
             reader.readAsDataURL(target.files[0]);
         }
     };
+
+    const handleCreateMap = (e: Event) => {
+        createMap("test");
+    }
+
     return (
         <>
             <input type="file" accept="image/*" onChange={handleFileChange}/>
+            <button onClick={handleCreateMap}>Create map</button>
             <div
                 ref={container}
                 style={{

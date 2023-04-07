@@ -8,7 +8,7 @@ const App: Component = () => {
         <div>
             <Routes>
                 <Route path={"/"} component={Login}/>
-                <Route path={"/map"} component={Map}/>
+                <Route path={"/map/:id"} component={Map}/>
             </Routes>
         </div>
     );
