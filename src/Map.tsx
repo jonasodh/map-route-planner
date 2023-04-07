@@ -98,8 +98,8 @@ const Map = (props: MapProps) => {
                 style={{
                     "position": "relative",
                     "overflow": "hidden",
-                    "width": "100vw",
-                    "height": "100vh",
+                    "width": "4096px",
+                    "height": "4096px",
                     "background-size": `${scale() * 100}%`,
                     "background-repeat": "no-repeat",
                     "background-position": `${position().x}px ${position().y}px`,
