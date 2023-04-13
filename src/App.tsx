@@ -1,10 +1,10 @@
-import {Component} from "solid-js";
+import {Component, onMount} from "solid-js";
 import {Route, Routes} from "@solidjs/router";
 import Map from "./routes/Map";
 import Login from "./routes/Login";
 import CreateMap from "./routes/CreateMap";
 import './index.css';
-import {signOut} from "firebase/auth";
+import {onAuthStateChanged, signOut} from "firebase/auth";
 import {auth} from "./firebase";
 
 const logout = () => {
@@ -17,17 +17,33 @@ const logout = () => {
 }
 
 const App: Component = () => {
+
+    onMount(() => {
+        if (auth.currentUser) {
+            console.log("User is logged in:", auth.currentUser);
+        }
+
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("User is logged in:", user);
+                //redirect to map
+            } else {
+                console.log("User is logged out");
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    });
+
     return (
         <div>
-            <button
-                class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-                onClick={logout}>Logout
-            </button>
             <br/>
             <Routes>
                 <Route path={"/"} component={Login}/>
                 <Route path={"/map/"} component={CreateMap}/>
-                <Route path={"/map/:id"} component={Map}/>
+                <Route path={"/maps/:id"} component={Map}/>
             </Routes>
         </div>
     );

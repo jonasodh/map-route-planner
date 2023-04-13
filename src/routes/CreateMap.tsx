@@ -1,9 +1,10 @@
 import {Component, createSignal} from "solid-js";
 import createMap from "../core/components/createMap";
 import {useNavigate} from "@solidjs/router";
-
+import {auth} from "../firebase";
 
 const CreateMap: Component = () => {
+    const user = auth.currentUser;
     const [
         mapName,
         setMapName
@@ -31,7 +32,7 @@ const CreateMap: Component = () => {
         if (mapName() === "") return;
         createMap(mapName(), mapImage()).then((message: string) => {
             console.log(message);
-            navigate("/map/" + mapName());
+            navigate("/maps/" + mapName());
         })
     }
 

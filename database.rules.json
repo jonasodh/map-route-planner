@@ -1,6 +1,10 @@
 {
   "rules": {
-    ".read": "now < 1683496800000",  // 2023-5-8
-    ".write": "now < 1683496800000",  // 2023-5-8
+    "maps": {
+      "$mapName": {
+        ".read": "!data.exists() || root.child('maps/' + $mapName + '/public').val() === true || root.child('maps/' + $mapName + '/owner').val() === auth.uid",
+        ".write": "(!data.exists() && newData.child('owner').val() === auth.uid) || (data.child('owner').val() === auth.uid)"
+      }
+    }
   }
 }
