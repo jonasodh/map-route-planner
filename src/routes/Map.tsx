@@ -34,6 +34,7 @@ const Map: Component = () => {
                 getDownloadURL(storageReference)
                     .then((url) => {
                         setMapImage(url);
+                        container.style.backgroundImage = `url(${mapImage()})`;
                         console.log(url);
                     })
                     .catch((error) => {
