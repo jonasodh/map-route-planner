@@ -1,12 +1,14 @@
 import {Component, createEffect, createSignal, For, onCleanup, onMount} from "solid-js";
-import {auth} from "./firebase";
+import {auth, database, storage} from "../firebase";
 import {useNavigate} from "@solidjs/router";
-import createMap from "./core/components/createMap";
+import {get, ref} from "firebase/database";
+import {getDownloadURL, ref as storageRef} from "firebase/storage";
 
 const Map: Component = () => {
     const [scale, setScale] = createSignal(1);
     const [position, setPosition] = createSignal({x: 0, y: 0});
     const [pins, setPins] = createSignal<Array<{ x: number; y: number }>>([]);
+    const [mapImage, setMapImage] = createSignal<string>("");
     let container!: HTMLDivElement;
     let isDragging = false;
     const navigate = useNavigate();
@@ -14,9 +16,34 @@ const Map: Component = () => {
         if (!auth.currentUser) {
             console.log("User is not logged in:", auth.currentUser);
             //redirect to map
-            navigate("/");
+            // navigate("/");
         }
+        getMapDataFromDatabase();
     });
+
+    const getMapDataFromDatabase = () => {
+        const mapName = window.location.pathname.split("/")[2];
+        console.log(mapName);
+        const dbRef = ref(database, "/maps/" + mapName);
+        get(dbRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                // setPins(data.pins);
+                console.log(data);
+                const storageReference = storageRef(storage, `maps/${data.name}`);
+                getDownloadURL(storageReference)
+                    .then((url) => {
+                        setMapImage(url);
+                        console.log(url);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            } else {
+                console.log("No data available");
+            }
+        });
+    };
 
     const handleClick = (e: MouseEvent) => {
         if (isDragging) return;
@@ -85,28 +112,8 @@ const Map: Component = () => {
         });
     });
 
-    const handleFileChange = (e: Event) => {
-        const target = e.target as HTMLInputElement;
-        if (target.files && target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const result = e.target?.result;
-                if (typeof result === "string") {
-                    container.style.backgroundImage = `url(${result})`;
-                }
-            };
-            reader.readAsDataURL(target.files[0]);
-        }
-    };
-
-    const handleCreateMap = (e: Event) => {
-        createMap("test");
-    }
-
     return (
         <>
-            <input type="file" accept="image/*" onChange={handleFileChange}/>
-            <button onClick={handleCreateMap}>Create map</button>
             <div
                 ref={container}
                 style={{
