@@ -1,6 +1,6 @@
 import {Component, createEffect, createSignal, For, onCleanup, onMount} from "solid-js";
 import {auth, database, storage} from "../firebase";
-import {useNavigate} from "@solidjs/router";
+import {useNavigate, useParams} from "@solidjs/router";
 import {get, ref} from "firebase/database";
 import {getDownloadURL, ref as storageRef} from "firebase/storage";
 
@@ -22,7 +22,8 @@ const Map: Component = () => {
     });
 
     const getMapDataFromDatabase = () => {
-        const mapName = window.location.pathname.split("/")[2];
+        const params = useParams();
+        const mapName = params.mapName;
         console.log(mapName);
         const dbRef = ref(database, "/maps/" + mapName);
         get(dbRef).then((snapshot) => {

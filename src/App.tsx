@@ -43,7 +43,7 @@ const App: Component = () => {
             <Routes>
                 <Route path={"/"} component={Login}/>
                 <Route path={"/map/"} component={CreateMap}/>
-                <Route path={"/maps/:id"} component={Map}/>
+                <Route path={"/maps/:mapName"} component={Map}/>
             </Routes>
         </div>
     );
