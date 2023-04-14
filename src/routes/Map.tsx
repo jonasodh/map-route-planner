@@ -1,36 +1,33 @@
 import {Component, createEffect, createSignal, For, onCleanup, onMount} from "solid-js";
 import {auth, database, storage} from "../firebase";
 import {useNavigate, useParams} from "@solidjs/router";
-import {get, ref} from "firebase/database";
+import {get, onValue, ref as dbRef, update} from "firebase/database";
 import {getDownloadURL, ref as storageRef} from "firebase/storage";
+import {Pin} from "../models/Pin";
+import {findPinElement} from "../core/components/findPinElement";
 
 const Map: Component = () => {
-    const [scale, setScale] = createSignal(1);
-    const [position, setPosition] = createSignal({x: 0, y: 0});
-    const [pins, setPins] = createSignal<Array<{ x: number; y: number }>>([]);
+    const [scale, setScale] = createSignal(.2);
+    const [position, setPosition] = createSignal({x: 470, y: 50});
+    const [pins, setPins] = createSignal<Pin[]>([]);
     const [mapImage, setMapImage] = createSignal<string>("");
+    const [mapName, setMapName] = createSignal<string>("");
     let container!: HTMLDivElement;
     let isDragging = false;
     const navigate = useNavigate();
+    const params = useParams();
     onMount(() => {
         if (!auth.currentUser) {
             console.log("User is not logged in:", auth.currentUser);
-            //redirect to map
-            // navigate("/");
         }
         getMapDataFromDatabase();
+        observePinsFromDatabase();
     });
-
     const getMapDataFromDatabase = () => {
-        const params = useParams();
-        const mapName = params.mapName;
-        console.log(mapName);
-        const dbRef = ref(database, "/maps/" + mapName);
-        get(dbRef).then((snapshot) => {
+        const databaseRef = dbRef(database, "/maps/" + params.mapName);
+        get(databaseRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                // setPins(data.pins);
-                console.log(data);
                 const storageReference = storageRef(storage, `maps/${data.name}`);
                 getDownloadURL(storageReference)
                     .then((url) => {
@@ -47,8 +44,12 @@ const Map: Component = () => {
         });
     };
 
+
     const handleClick = (e: MouseEvent) => {
         if (isDragging) return;
+        const pinElement = findPinElement(e.target as HTMLElement);
+        console.log(pinElement);
+        if (pinElement) return;
 
         e.preventDefault();
         const rect = container.getBoundingClientRect();
@@ -58,7 +59,63 @@ const Map: Component = () => {
         const offsetY = pinHeight / 2;
         const x = (e.clientX - rect.left - position().x - offsetX) / scale();
         const y = (e.clientY - rect.top - position().y - offsetY) / scale();
-        setPins([...pins(), {x, y}]);
+        setPinsInDatabase([...pins(), {x, y}]);
+    };
+
+    const observePinsFromDatabase = () => {
+        const databaseRef = dbRef(database, "/maps/" + params.mapName + "/pins");
+        console.log("dit werkt")
+        const onDataChange = (snapshot: any) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                if (typeof data === 'object') {
+                    const pinsArray: Pin[] = Object.entries(data).map(([id, pinData]) => {
+                        const typedPinData = pinData as Pin;
+                        console.log("Pins from database:", typedPinData)
+                        return {
+                            id: id,
+                            x: typedPinData.x,
+                            y: typedPinData.y,
+                        };
+                    });
+
+                    setPins(pinsArray);
+                } else {
+                    console.warn('Received data is not an object');
+                }
+            } else {
+                console.log('No data available');
+            }
+        };
+
+        onValue(databaseRef, onDataChange);
+        const unsubscribe = onValue(databaseRef, onDataChange);
+
+        // Cleanup function
+        return () => {
+            unsubscribe();
+        };
+    };
+
+
+    const removePinFromDatabase = (index: number) => {
+        console.log("Removing pin from database..")
+        if (pins().length <= 1) {
+            setPinsInDatabase([]);
+            return;
+        }
+        const pinsCopy = [...pins()];
+        pinsCopy.splice(index, 1);
+        setPinsInDatabase(pinsCopy);
+    }
+
+    const setPinsInDatabase = (pins: Pin[]) => {
+        console.log("Updating pins in database..")
+        const databaseRef = dbRef(database, "/maps/" + params.mapName);
+        console.log(dbRef)
+        update(databaseRef, {pins}).then(() => {
+            console.log("Pins updated");
+        });
     };
     createEffect(() => {
         if (!container) return;
@@ -130,6 +187,11 @@ const Map: Component = () => {
             >
                 <For each={pins()}>{(pin) => (
                     <div
+                        data-pin="true"
+                        onClick={(e: MouseEvent) => {
+                            e.stopPropagation();
+                            removePinFromDatabase(pins().indexOf(pin));
+                        }}
                         style={{
                             "position": "absolute",
                             "left": `${(pin.x * scale() + position().x)}px`,
