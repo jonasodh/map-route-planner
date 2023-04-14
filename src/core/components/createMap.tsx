@@ -2,7 +2,7 @@ import {auth, database, storage} from "../../firebase";
 import {get, ref, update} from "firebase/database";
 import {ref as storageRef, uploadBytes} from "firebase/storage";
 
-const createMap = (name: string, file: Blob): Promise<string> => {
+const createMap = (name: string, file: Blob, isPublic: boolean): Promise<string> => {
     return new Promise((resolve, reject) => {
         const user = auth.currentUser;
         console.log(user?.uid)
@@ -23,7 +23,7 @@ const createMap = (name: string, file: Blob): Promise<string> => {
                                 image: e.metadata.fullPath,
                                 owner: user?.uid,
                                 pins: "",
-                                public: true
+                                public: isPublic
                             })
                                 .catch((error) => {
                                     console.error("Error updating map:", error);

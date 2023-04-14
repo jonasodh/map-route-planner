@@ -3,7 +3,7 @@
     "maps": {
       "$mapName": {
         ".read": "!data.exists() || root.child('maps/' + $mapName + '/public').val() === true || root.child('maps/' + $mapName + '/owner').val() === auth.uid",
-        ".write": "(!data.exists() && newData.child('owner').val() === auth.uid) || (data.child('owner').val() === auth.uid)"
+        ".write": "!data.exists() || root.child('maps/' + $mapName + '/public').val() === true || root.child('maps/' + $mapName + '/owner').val() === auth.uid"
       }
     }
   }

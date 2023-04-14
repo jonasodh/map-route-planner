@@ -1,6 +1,6 @@
 import {Component, createEffect, createSignal, For, onCleanup, onMount} from "solid-js";
 import {auth, database, storage} from "../firebase";
-import {useNavigate, useParams} from "@solidjs/router";
+import {useParams} from "@solidjs/router";
 import {get, onValue, ref as dbRef, update} from "firebase/database";
 import {getDownloadURL, ref as storageRef} from "firebase/storage";
 import {Pin} from "../models/Pin";
@@ -11,10 +11,8 @@ const Map: Component = () => {
     const [position, setPosition] = createSignal({x: 470, y: 50});
     const [pins, setPins] = createSignal<Pin[]>([]);
     const [mapImage, setMapImage] = createSignal<string>("");
-    const [mapName, setMapName] = createSignal<string>("");
     let container!: HTMLDivElement;
     let isDragging = false;
-    const navigate = useNavigate();
     const params = useParams();
     onMount(() => {
         if (!auth.currentUser) {
@@ -33,13 +31,13 @@ const Map: Component = () => {
                     .then((url) => {
                         setMapImage(url);
                         container.style.backgroundImage = `url(${mapImage()})`;
-                        console.log(url);
                     })
                     .catch((error) => {
                         console.log(error);
                     });
             } else {
                 console.log("No data available");
+                update(databaseRef, {pins: ""})
             }
         });
     };
@@ -64,14 +62,12 @@ const Map: Component = () => {
 
     const observePinsFromDatabase = () => {
         const databaseRef = dbRef(database, "/maps/" + params.mapName + "/pins");
-        console.log("dit werkt")
         const onDataChange = (snapshot: any) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 if (typeof data === 'object') {
                     const pinsArray: Pin[] = Object.entries(data).map(([id, pinData]) => {
                         const typedPinData = pinData as Pin;
-                        console.log("Pins from database:", typedPinData)
                         return {
                             id: id,
                             x: typedPinData.x,
@@ -85,13 +81,16 @@ const Map: Component = () => {
                 }
             } else {
                 console.log('No data available');
+                const mapRef = dbRef(database, "/maps/" + params.mapName);
+                setPins([])
+                update(mapRef, {pins: ""})
             }
         };
 
-        onValue(databaseRef, onDataChange);
-        const unsubscribe = onValue(databaseRef, onDataChange);
 
-        // Cleanup function
+        onValue(databaseRef, onDataChange);
+        //clean up
+        const unsubscribe = onValue(databaseRef, onDataChange);
         return () => {
             unsubscribe();
         };
@@ -112,7 +111,6 @@ const Map: Component = () => {
     const setPinsInDatabase = (pins: Pin[]) => {
         console.log("Updating pins in database..")
         const databaseRef = dbRef(database, "/maps/" + params.mapName);
-        console.log(dbRef)
         update(databaseRef, {pins}).then(() => {
             console.log("Pins updated");
         });

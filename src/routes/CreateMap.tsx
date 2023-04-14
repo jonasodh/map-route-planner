@@ -1,15 +1,15 @@
 import {Component, createSignal} from "solid-js";
 import createMap from "../core/components/createMap";
 import {useNavigate} from "@solidjs/router";
-import {auth} from "../firebase";
 
 const CreateMap: Component = () => {
-    const user = auth.currentUser;
     const [
         mapName,
         setMapName
     ] = createSignal("");
     const [mapImage, setMapImage] = createSignal<Blob>(new Blob());
+    const [invitedUsers, setInvitedUsers] = createSignal<string[]>([]);
+    const [isPublic, setIsPublic] = createSignal(false);
     const navigate = useNavigate();
 
     const handleMapInput = (e: any) => {
@@ -17,6 +17,10 @@ const CreateMap: Component = () => {
         if (e.target.value !== "") {
             setMapName(e.target.value);
         }
+    }
+
+    const handleIsPublicInput = (e: any) => {
+        setIsPublic(e.target.checked);
     }
 
     const handleMapImage = (event: any) => {
@@ -30,7 +34,7 @@ const CreateMap: Component = () => {
     const handleCreateMap = () => {
         console.log("Creating map.. " + mapName());
         if (mapName() === "") return;
-        createMap(mapName(), mapImage()).then((message: string) => {
+        createMap(mapName(), mapImage(), isPublic()).then((message: string) => {
             console.log(message);
             navigate("/maps/" + mapName());
         })
@@ -51,6 +55,20 @@ const CreateMap: Component = () => {
                     }
                     }/>
                 </label>
+
+                <label class="block">
+                    <span
+                        class="after:content-['*'] after:ml-0.5 after:text-red-500 block text-sm font-medium text-slate-700">
+                        Public
+                    </span>
+                    <input type="checkbox" name="checkbox"
+                           class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1"
+                           required value={invitedUsers()} onChange={(event) => {
+                        handleIsPublicInput(event);
+                    }
+                    }/>
+                </label>
+
 
                 <div class="flex items-center justify-between">
                     <div class="mt-5">
