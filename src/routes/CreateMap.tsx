@@ -1,6 +1,7 @@
 import {Component, createSignal} from "solid-js";
 import createMap from "../core/components/createMap";
 import {useNavigate} from "@solidjs/router";
+import TopNavigation from "../core/components/TopNavigation";
 
 const CreateMap: Component = () => {
     const [
@@ -42,7 +43,8 @@ const CreateMap: Component = () => {
 
     return (
         <>
-            <div class="container mx-auto">
+            <TopNavigation/>
+            <div class="container mx-auto mt-20">
                 <label class="block">
                     <span
                         class="after:content-['*'] after:ml-0.5 after:text-red-500 block text-sm font-medium text-slate-700">

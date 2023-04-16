@@ -1,10 +1,11 @@
 import {Component, createEffect, createSignal, For, onCleanup, onMount} from "solid-js";
 import {auth, database, storage} from "../firebase";
-import {useParams} from "@solidjs/router";
+import {useLocation, useParams} from "@solidjs/router";
 import {get, onValue, ref as dbRef, update} from "firebase/database";
 import {getDownloadURL, ref as storageRef} from "firebase/storage";
 import {Pin} from "../models/Pin";
 import {findPinElement} from "../core/components/findPinElement";
+import TopNavigation from "../core/components/TopNavigation";
 
 const Map: Component = () => {
     const [scale, setScale] = createSignal(.2);
@@ -14,6 +15,7 @@ const Map: Component = () => {
     let container!: HTMLDivElement;
     let isDragging = false;
     const params = useParams();
+    const location = useLocation();
     onMount(() => {
         if (!auth.currentUser) {
             console.log("User is not logged in:", auth.currentUser);
@@ -116,6 +118,9 @@ const Map: Component = () => {
         });
     };
     createEffect(() => {
+        console.log(location.pathname);
+        getMapDataFromDatabase();
+        observePinsFromDatabase();
         if (!container) return;
 
         const handleMouseDown = (e: MouseEvent) => {
@@ -171,6 +176,7 @@ const Map: Component = () => {
 
     return (
         <>
+            <TopNavigation/>
             <div
                 ref={container}
                 style={{

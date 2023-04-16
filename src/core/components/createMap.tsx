@@ -7,9 +7,9 @@ const createMap = (name: string, file: Blob, isPublic: boolean): Promise<string>
         const user = auth.currentUser;
         console.log(user?.uid)
         const databaseRef = ref(database, `maps/${name}`);
+        const userRef = ref(database, `users/${user?.uid}/maps`);
         get(databaseRef)
             .then((snapshot) => {
-                console.log('dit werkt')
                 if (!snapshot.exists()) {
                     console.log("Creating map")
                     const storageReference = storageRef(
@@ -24,6 +24,15 @@ const createMap = (name: string, file: Blob, isPublic: boolean): Promise<string>
                                 owner: user?.uid,
                                 pins: "",
                                 public: isPublic
+                            }).then(() => {
+                                update(userRef, {
+                                    [name]: true
+                                }).then(() => {
+                                    resolve("Map added to user");
+                                }).catch((error) => {
+                                    console.error("Error updating user:", error);
+                                    reject(error);
+                                });
                             })
                                 .catch((error) => {
                                     console.error("Error updating map:", error);
