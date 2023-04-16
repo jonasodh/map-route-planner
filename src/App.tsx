@@ -6,6 +6,7 @@ import CreateMap from "./routes/CreateMap";
 import './index.css';
 import {onAuthStateChanged, signOut} from "firebase/auth";
 import {auth} from "./firebase";
+import 'remixicon/fonts/remixicon.css';
 
 const logout = () => {
     console.log("Logging out")

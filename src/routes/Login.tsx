@@ -39,8 +39,12 @@ const LoginComponent = () => {
     });
 
     return (
-        <div>
-            <button onClick={signInWithGoogle}>Sign in with Google</button>
+        <div class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]">
+            <h1 class="text-5xl font-bold">Map creator</h1>
+            <button
+                class="bg-blue-500 hover:bg-blue-400 text-white text-sm font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mt-5"
+                onClick={signInWithGoogle}>Sign in with Google
+            </button>
         </div>
     );
 };

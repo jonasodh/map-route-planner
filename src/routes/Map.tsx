@@ -189,7 +189,7 @@ const Map: Component = () => {
                     "background-position": `${position().x}px ${position().y}px`,
                 }}
             >
-                <For each={pins()}>{(pin) => (
+                <For each={pins()}>{(pin, index) => (
                     <div
                         data-pin="true"
                         onClick={(e: MouseEvent) => {
@@ -198,17 +198,20 @@ const Map: Component = () => {
                         }}
                         style={{
                             "position": "absolute",
-                            "left": `${(pin.x * scale() + position().x)}px`,
-                            "top": `${(pin.y * scale() + position().y)}px`,
+                            "left": `${(pin.x * scale() + position().x - 12)}px`,
+                            "top": `${(pin.y * scale() + position().y - 45)}px`,
                             "width": "25px",
                             "height": "25px",
-                            "background-color": "red",
                             "border-radius": "50%",
                             "background-size": `${scale() * 100}%`,
                             "background-repeat": "no-repeat",
                             "background-position": `${position().x}px ${position().y}px`,
-                        }}
-                    ></div>
+                            "display": "flex",
+                            "flex-direction": "column",
+                            "font-size": "3rem",
+                        }}>
+                        <i class="text-red-500 ri-map-pin-fill"></i>
+                    </div>
                 )}</For>
             </div>
         </>

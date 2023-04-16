@@ -21,7 +21,6 @@ const TopNavigation: Component = () => {
                 }
             });
         }
-
     }
 
     const handleAuthStateChanged = (user: any) => {
@@ -32,7 +31,7 @@ const TopNavigation: Component = () => {
 
     onMount(() => {
         const unsubscribe = onAuthStateChanged(auth, handleAuthStateChanged);
-        return () => unsubscribe(); // Clean up the subscription when the component is unmounted
+        return () => unsubscribe();
     });
 
     const redirectToMap = (mapName: string) => {
@@ -42,12 +41,14 @@ const TopNavigation: Component = () => {
     return (
         <>
             <header class="bg-white fixed top-0 z-10 w-full">
-                <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+                <nav class="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
                     <div class="flex lg:flex-1">
                         <a href="#" class="-m-1.5 p-1.5">
                             <span class="sr-only">Maps</span>
-                            <img class="h-8 w-auto"
-                                 src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt=""/>
+                            <div
+                                class="flex text-blue-500  text-4xl h-11 w-11 flex-none items-center justify-center rounded-lg  group-hover:bg-white">
+                                <i class="ri-compass-3-line"></i>
+                            </div>
                         </a>
                     </div>
                     <div class="flex lg:hidden">
@@ -80,24 +81,17 @@ const TopNavigation: Component = () => {
                                     <div class="p-4  ">
                                         <For each={maps()}>{(userMap) => (
                                             <div
-                                                class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50">
+                                                class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50 cursor-pointer">
                                                 <div
-                                                    class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                                    <svg class="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
-                                                         fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                                         stroke="currentColor" aria-hidden="true">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"/>
-                                                    </svg>
+                                                    class="flex text-blue-500  text-xl h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                                                    <i class=" ri-road-map-fill"></i>
                                                 </div>
                                                 <div class="flex-auto">
                                                     <div onClick={() => {
                                                         redirectToMap(userMap)
                                                     }}
-                                                         class="block font-semibold text-gray-900">
-                                                        {userMap}
+                                                         class="capitalize block font-semibold text-gray-900">
+                                                        {userMap.replace('-', ' ')}
                                                         <span class="absolute inset-0"></span>
                                                     </div>
                                                 </div>
@@ -122,7 +116,7 @@ const TopNavigation: Component = () => {
                         </div>
 
 
-                        <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Public maps</a>
+                        <a href="#" class="text-sm font-semibold leading-6 text-gray-500">Public maps</a>
                     </div>
                     <div class="hidden lg:flex lg:flex-1 lg:justify-end">
                         <A href="/map"
@@ -155,7 +149,7 @@ const TopNavigation: Component = () => {
                                         <button type="button"
                                                 class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 hover:bg-gray-50"
                                                 aria-controls="disclosure-1" aria-expanded="false">
-                                            Product
+                                            Projects
                                             <svg class="h-5 w-5 flex-none" viewBox="0 0 20 20" fill="currentColor"
                                                  aria-hidden="true">
                                                 <path fill-rule="evenodd"
@@ -164,41 +158,18 @@ const TopNavigation: Component = () => {
                                             </svg>
                                         </button>
                                         <div class="mt-2 space-y-2" id="disclosure-1">
-                                            <a href="#"
-                                               class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Analytics</a>
-
-                                            <a href="#"
-                                               class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Engagement</a>
-
-                                            <a href="#"
-                                               class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Security</a>
-
-                                            <a href="#"
-                                               class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Integrations</a>
-
-                                            <a href="#"
-                                               class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Automations</a>
-
-                                            <a href="#"
-                                               class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Watch
-                                                demo</a>
-
-                                            <a href="#"
-                                               class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Contact
-                                                sales</a>
+                                            <For each={maps()}>{(userMap) => (
+                                                <A href={"/maps/" + userMap}
+                                                   class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">{userMap}</A>
+                                            )}
+                                            </For>
                                         </div>
                                     </div>
-                                    <a href="#"
-                                       class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Features</a>
-                                    <a href="#"
-                                       class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Marketplace</a>
-                                    <a href="#"
-                                       class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Company</a>
                                 </div>
                                 <div class="py-6">
-                                    <a href="#"
-                                       class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Log
-                                        in</a>
+                                    <A href="/map"
+                                       class="bg-blue-500 hover:bg-blue-400 text-white text-sm font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded ">Create
+                                        map</A>
                                 </div>
                             </div>
                         </div>
